@@ -1,0 +1,11 @@
+@import url('https://fonts.googleapis.com/css2?family=Overpass:wght@900&display=swap');
+
+body {
+    font-family: Overpass;
+    font-size: 80px;
+    color: rgb(172, 172, 172)
+}
+
+#status {
+    margin-left: 100px;
+}
