@@ -5,7 +5,7 @@ let targetB
 function genTargetColor(){
 
   targetR = Math.floor(Math.random()*255)
-  targetG = Math.floor(Math.random()*255)
+  targetG = Math.floor(Math.random()*255)//255 - targetR
   targetB = Math.floor(Math.random()*255)
 }
 
@@ -18,22 +18,29 @@ context.fillRect(100, 30, 150, 150);
 
  function genColorChart(){
  let grd = context.createLinearGradient(90, 0, 900, 0);
-  grd.addColorStop(0.05, "magenta");
+  grd.addColorStop(0.01, "cyan"); 
+  grd.addColorStop(0.1, "magenta");
   grd.addColorStop(0.25, "blue");
-  grd.addColorStop(/*((Math.random()).toFixed(2))*/0.5, "green");
+  grd.addColorStop(((Math.random()).toFixed(2))/*0.5*/, "green");
   grd.addColorStop(0.6, "yellow");
   grd.addColorStop(0.7, "red")
-  grd.addColorStop(0.95, "white");
+  grd.addColorStop(0.85, "white");
+  grd.addColorStop(0.96, "cyan");
   context.fillStyle = grd;
   context.fillRect(100, 390, 900, 150)
+
 }
+
 
 //call function
   genColorChart()
 
+
   let colorAccuracy
   let statusOfClick = true;
-  //let countOfClicks = 0
+  let countOfClicks = 0
+
+//function removeList(){}
 
 
 function toggleStatusOfClick() {
@@ -45,10 +52,21 @@ function toggleStatusOfClick() {
   calcAccuracy()
   listResults(colorAccuracy)}
   //document.body.style.setProperty('--main-color',"#00aa00")
-  //countOfClicks ++
-  //console.log("count of clicks is: ", countOfClicks)
-}
+  countOfClicks ++
+  console.log("count of clicks is: ", countOfClicks)
 
+  if (countOfClicks % 6 == 0){
+    genColorChart()
+    
+    countOfClicks = 0
+
+    document.querySelector("#listParent").innerHTML = ""
+    console.log("wer")
+
+  }
+
+  
+}
 
 
 function calcAccuracy(){
@@ -63,18 +81,20 @@ function calcAccuracy(){
 
 listResults = function(arg) {
 
-  let results = document.getElementById("results");
+  let results = document.getElementById("listParent");
       var newLi = document.createElement("li");
+
       newLi.innerHTML = `${arg}%`;
       results.appendChild(newLi);
+
 }
 
 
 let clickableSpace = document.getElementById("example");
     clickableSpace.addEventListener("click", toggleStatusOfClick);
 
-    let currColor
-    let userR, userG, userB
+let currColor
+let userR, userG, userB
 
 function hoverRgb(e) {
 
