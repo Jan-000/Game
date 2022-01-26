@@ -1,3 +1,5 @@
+let context = example.getContext("2d");
+
 let targetR
 let targetG
 let targetB
@@ -7,14 +9,19 @@ function genTargetColor(){
   targetR = Math.floor(Math.random()*255)
   targetG = Math.floor(Math.random()*255)//255 - targetR
   targetB = Math.floor(Math.random()*255)
+
+  let example = document.getElementById("example");
+  
+
+  context.fillStyle = `rgb(${targetR},${targetG},${targetB})`;
+  context.fillRect(100, 30, 150, 150);
+  console.log("Target color has been generated")
 }
 
 genTargetColor()
 
-let example = document.getElementById("example");
-let context = example.getContext("2d");
-context.fillStyle = `rgb(${targetR},${targetG},${targetB})`;
-context.fillRect(100, 30, 150, 150);
+
+
 
  function genColorChart(){
  let grd = context.createLinearGradient(90, 0, 900, 0);
@@ -44,6 +51,7 @@ context.fillRect(100, 30, 150, 150);
 
 
 function toggleStatusOfClick() {
+  
   statusOfClick = !statusOfClick;
   console.log("current status of statusOfClick: ", statusOfClick);
   console.log("current color is", currentColor)
@@ -57,15 +65,12 @@ function toggleStatusOfClick() {
 
   if (countOfClicks % 6 == 0){
     genColorChart()
-    
+
     countOfClicks = 0
 
     document.querySelector("#listParent").innerHTML = ""
-    console.log("wer")
-
+    genTargetColor()
   }
-
-  
 }
 
 
