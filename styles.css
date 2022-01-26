@@ -2,10 +2,32 @@
 
 body {
     font-family: Overpass;
-    font-size: 80px;
+    font-size: 40px;
     color: rgb(172, 172, 172)
 }
 
-#status {
+#status, #results {
     margin-left: 100px;
 }
+
+#test-field{
+
+background-image:#ffffff;background-image:  
+radial-gradient(at 99% 29%, hsla(300,100%,50%,1) 0, transparent 21%),  
+radial-gradient(at 34% 26%, hsla(60,100%,50%,1) 0, transparent 27%),  
+radial-gradient(at 49% 57%, hsla(120,100%,50%,1) 0, transparent 30%),  
+radial-gradient(at 64% 28%, hsla(180,100%,50%,1) 0, transparent 29%),  
+radial-gradient(at 83% 58%, hsla(240,100%,50%,1) 0, transparent 29%),  
+radial-gradient(at 0% 35%, hsla(300,100%,50%,1) 0, transparent 32%),  
+radial-gradient(at 16% 58%, hsla(0,100%,50%,1) 0, transparent 31%),  
+radial-gradient(at 50% 100%, hsla(0,0%,0%,1) 0, transparent 25%),  
+radial-gradient(at 31% 98%, hsla(0,0%,0%,1) 0, transparent 22%),  
+radial-gradient(at 69% 99%, hsla(0,0%,0%,1) 0, transparent 22%),  
+radial-gradient(at 97% 100%, hsla(0,0%,0%,1) 0, transparent 24%),  
+radial-gradient(at 3% 99%, hsla(0,0%,0%,1) 0, transparent 21%);
+}
+
+/*ul {
+        color: var(MainColor);
+        color: var(--main-color);
+}*/
