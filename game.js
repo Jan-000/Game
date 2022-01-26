@@ -3,6 +3,8 @@ let scoreTracking=[]
 let targetR
 let targetG
 let targetB
+let highestScoredColor
+let currentColorDatabase = []
 
 function genTargetColor(){
 
@@ -59,7 +61,7 @@ function toggleStatusOfClick() {
   if (!statusOfClick){
   calcAccuracy()
   listResults(colorAccuracy)}
-  //document.body.style.setProperty('--main-color',"#00aa00")
+  
   countOfClicks ++
   console.log("count of clicks is: ", countOfClicks)
 
@@ -72,11 +74,25 @@ function toggleStatusOfClick() {
     genColorChart()
 
     countOfClicks = 0
-    document.querySelector("#displayFeedback").innerHTML = `Your best sensitivity is ${Math.max(...scoreTracking)}% in THAT spectrum.`
+    document.querySelector("#displayFeedback").innerHTML = `Your best sensitivity is ${Math.max(...scoreTracking)}% in <span>that spectrum.</span>`
+    // console.log("dat ccd: ",currentColorDatabase)
+    // console.log("dat skor trakkin: ", scoreTracking)
+    // console.log("dat max score: ", Math.max(...scoreTracking))
+    // console.log("dat index of max score: ", (scoreTracking.indexOf(Math.max(...scoreTracking))))
+    highestScoredColor = currentColorDatabase[scoreTracking.indexOf(Math.max(...scoreTracking))]
+    console.log("this is highest scored color : ", highestScoredColor )
+
+
+    
+
+
+    
     scoreTracking=[]
+    currentColorDatabase = []
     document.querySelector("#listParent").innerHTML = ""
     giveFeedback()
-    
+    document.querySelector("#displayFeedback>span").style.color = `rgb(${highestScoredColor[0]}, ${highestScoredColor[1]}, ${highestScoredColor[2]})`;
+    console.log("to kod rgb spanu", `rgb(${highestScoredColor[0]}, ${highestScoredColor[1]}, ${highestScoredColor[2]})`)
   }
 }
 
@@ -84,7 +100,7 @@ function toggleStatusOfClick() {
 function calcAccuracy(){
   //console.log("target B is: ",targetB)
   //console.log("user B is: ", userB)
-  colorAccuracy = ((1-((((targetR - userR)**2 + (targetG - userG)**2 + (targetB - userB)**2)**0.5)/(255**2+255**2+255**2)**0.5))*100).toFixed(0)
+  colorAccuracy = +((1-((((targetR - userR)**2 + (targetG - userG)**2 + (targetB - userB)**2)**0.5)/(255**2+255**2+255**2)**0.5))*100).toFixed(0)
   console.log("typeof colorAccuracy is", typeof(colorAccuracy))
   console.log("accuracy equals", colorAccuracy)
 
@@ -101,6 +117,9 @@ listResults = function(arg) {
 
       scoreTracking.push(arg)
       console.log("Your score is: ", scoreTracking)
+
+      currentColorDatabase.push(currentColor)
+      //console.log("this is currentColorDatabase: ", currentColorDatabase)
 }
 
 
@@ -128,6 +147,7 @@ function hoverRgb(e) {
      userB = p[2]
 
   } currentColor = [userR, userG, userB]
+  
 
 }
 

@@ -27,7 +27,8 @@ radial-gradient(at 97% 100%, hsla(0,0%,0%,1) 0, transparent 24%),
 radial-gradient(at 3% 99%, hsla(0,0%,0%,1) 0, transparent 21%);
 }*/
 
-/*ul {
-        color: var(MainColor);
-        color: var(--main-color);
-}*/
+#displayFeedback > span {
+        font-size: 45px;
+
+
+}
