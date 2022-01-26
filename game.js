@@ -1,5 +1,5 @@
 let context = example.getContext("2d");
-
+let scoreTracking=[]
 let targetR
 let targetG
 let targetB
@@ -63,13 +63,20 @@ function toggleStatusOfClick() {
   countOfClicks ++
   console.log("count of clicks is: ", countOfClicks)
 
+
+  if (countOfClicks % 2 == 0){
+    genTargetColor()}
+
+
   if (countOfClicks % 6 == 0){
     genColorChart()
 
     countOfClicks = 0
-
+    document.querySelector("#displayFeedback").innerHTML = `Your best sensitivity is ${Math.max(...scoreTracking)}% in THAT spectrum.`
+    scoreTracking=[]
     document.querySelector("#listParent").innerHTML = ""
-    genTargetColor()
+    giveFeedback()
+    
   }
 }
 
@@ -92,6 +99,8 @@ listResults = function(arg) {
       newLi.innerHTML = `${arg}%`;
       results.appendChild(newLi);
 
+      scoreTracking.push(arg)
+      console.log("Your score is: ", scoreTracking)
 }
 
 
@@ -128,5 +137,9 @@ document.getElementById("example").addEventListener("mousemove", hoverRgb);
 
 //flag 
 
+function giveFeedback(){
+  if (colorAccuracy > 90){console.log("xD")}
+  else {console.log("idz pan w cholere z takimi oczami")}
+}
 
 
