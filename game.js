@@ -135,7 +135,7 @@ function toggleStatusOfClick() {
         newFeedback.classList.add("scale-up-center")
 
 
-      newFeedback.innerHTML = `Your best sensitivity is <span class="colored"> ${Math.max(...scoreValuesTracking)}% <br>for that spectrum.</span>`;
+      newFeedback.innerHTML = `<span class="colored"> ${Math.max(...scoreValuesTracking)}% </span>is your best sensitivity<br><span class="colored">for that spectrum.</span>`;
       document.querySelector("#displayFeedback").appendChild(newFeedback);
 
 

@@ -2,15 +2,14 @@
 
 body {
     font-family: Overpass;
-    font-size: 29px;
-    color: rgb(172, 172, 172);
-    background-color: rgb(228, 219, 210)
+    font-size: 28.5px;
+    color: rgb(152, 152, 152);
+    background-color: rgb(240, 236, 232)
 }
 
 #status {
     margin-left: 100px;
     margin-top: 0px;
-
 }
 
 
@@ -21,8 +20,7 @@ body {
 
 #displayFeedback {
     margin-left: 100px;
-
-    text-align: justify;
+margin-top: -15px
 }
 
 
@@ -53,7 +51,8 @@ span {
 
 ul {
     list-style: none;
-    margin-left: 6px;
+    margin-left: 8px;
+    margin-top: 10px;
 }
 
 
