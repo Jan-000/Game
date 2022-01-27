@@ -3,7 +3,7 @@
 body {
     font-family: Overpass;
     font-size: 28.5px;
-    color: rgb(152, 152, 152);
+    color: rgb(157, 157, 157);
     background-color: rgb(240, 236, 232)
 }
 
@@ -21,6 +21,10 @@ body {
 #displayFeedback {
     margin-left: 100px;
 margin-top: -15px
+}
+
+#example {
+    animation: squares .8s ease-in ;
 }
 
 
@@ -48,6 +52,16 @@ span {
             opacity: 1;
   }
 }
+
+
+@keyframes squares {
+    0% {
+              opacity: 0.6;
+    }
+    100% {
+              opacity: 1;
+    }
+  }
 
 ul {
     list-style: none;

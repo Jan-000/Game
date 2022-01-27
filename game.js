@@ -36,6 +36,7 @@ function genTargetColorTriplet(){
 
   targetColorTriplet.push(targetColor1, targetColor2, targetColor3)}
 
+
 function drawTargets() { //powieksza countery
 
   if (targetRectCounter == 0){
@@ -129,13 +130,16 @@ function toggleStatusOfClick() {
     genColorChart()
 
     countOfClicks = 0
+    userRectCounter = 0
+
+    
 
 
     let newFeedback = document.createElement("p")
         newFeedback.classList.add("scale-up-center")
 
 
-      newFeedback.innerHTML = `<span class="colored"> ${Math.max(...scoreValuesTracking)}% </span>is your best sensitivity<br><span class="colored">for that spectrum.</span>`;
+      newFeedback.innerHTML = `<span class="colored"> ${Math.max(...scoreValuesTracking)}% </span>is your best sensitivity<br><span class="colored">within that spectrum.</span>`;
       document.querySelector("#displayFeedback").appendChild(newFeedback);
 
 
