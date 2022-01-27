@@ -161,7 +161,7 @@ function toggleStatusOfClick() {
   }
 }
 
-//CORRECT
+
 function calcAccuracy(){
 
   colorAccuracy = +((1-((((targetRR - userR)**2 + (targetGG - userG)**2 + (targetBB - userB)**2)**0.5)/(255**2+255**2+255**2)**0.5))*100).toFixed(0)
@@ -183,7 +183,7 @@ listResults = function(arg) {
       console.log("Your score is: ", scoreValuesTracking)
 
       scoredColorsArray.push(currentColor)
-      //console.log("this is scoredColorsArray: ", scoredColorsArray)
+      console.log("this is scoredColorsArray: ", scoredColorsArray)
 }
 
 
