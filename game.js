@@ -9,9 +9,11 @@ let scoredColorsArray = []
 let targetRectCounter = 0
 let userRectCounter = -1
 let targetColorTriplet = []
+let currColor
+let userR, userG, userB
 
 
-function genTargetColor(){
+function genTargetColorTriplet(){
 
   targetRR = Math.floor(Math.random()*255)
   targetGG = Math.floor(Math.random()*255)
@@ -30,71 +32,67 @@ function genTargetColor(){
   targetBB = Math.floor(Math.random()*255)
 
   targetColor3 = `rgb(${targetRR},${targetGG},${targetBB})`
- 
-
-  targetR = Math.floor(Math.random()*255)
-  targetG = Math.floor(Math.random()*255)
-  targetB = Math.floor(Math.random()*255)
-
-  targetColorTriplet.push(targetColor1, targetColor2, targetColor3)
   console.log("color triplet is: ", targetColorTriplet)
 
-  document.getElementById("example");
+  targetColorTriplet.push(targetColor1, targetColor2, targetColor3)}
 
-  context.fillStyle = `rgb(${targetR},${targetG},${targetB})`;
+function drawTargets() {
 
   if (targetRectCounter == 0){
 
+    context.fillStyle = targetColor1;
     context.fillRect(100, 30, 150, 150)
+    console.log("Target color has been generated:", targetColor1)
   }
   
   
-
   if (targetRectCounter == 1){
-
+    context.fillStyle = targetColor2;
     context.fillRect(280, 30, 150, 150);
+    console.log("Target color has been generated:", targetColor2)
   }
 
   if (targetRectCounter == 2){
-
+    context.fillStyle = targetColor3;
     context.fillRect(460, 30, 150, 150);
+    console.log("Target color has been generated:", targetColor3)
   }
 
   targetRectCounter ++
   userRectCounter ++
 
   console.log("user Rect equals: ", userRectCounter)
-  console.log("Target color has been generated: ", `rgb(${targetR},${targetG},${targetB})`)
 }
 
-genTargetColor()
+genTargetColorTriplet()
+drawTargets()
+
 
  function genColorChart(){
-   console.log("generated gradient has: ", `rgb(${targetR},${targetG},${targetB})`)
+   console.log("generated gradient has: ", targetColor1, targetColor2, targetColor3)
  let grd = context.createLinearGradient(90, 0, 900, 0);
-  grd.addColorStop(((Math.random()).toFixed(1)), "cyan"); 
-  grd.addColorStop(((Math.random()).toFixed(1)), "magenta");
-  grd.addColorStop(((Math.random()).toFixed(1)), "blue");
-  grd.addColorStop(((Math.random()).toFixed(1)), `rgb(${targetR},${targetG},${targetB})`);
-  grd.addColorStop(((Math.random()).toFixed(1)), "yellow");
-  grd.addColorStop(((Math.random()).toFixed(1)), `rgb(${targetR},${targetG},${targetB})`);
-  grd.addColorStop(((Math.random()).toFixed(1)), "red")
-  grd.addColorStop(((Math.random()).toFixed(1)), "white");
-  grd.addColorStop(((Math.random()).toFixed(1)), "black");
+  grd.addColorStop(0, "white"); 
+  grd.addColorStop("0.2", targetColor3);
+  grd.addColorStop("0.4", targetColor3); 
+  grd.addColorStop("0.5", targetColor2);
+  grd.addColorStop("0.7", targetColor2);
+  grd.addColorStop("0.75", targetColor1);
+  grd.addColorStop("0.9", targetColor1);
+  grd.addColorStop(1, "cyan");
+ 
+ 
   context.fillStyle = grd;
   context.fillRect(100, 390, 900, 150)
 
 }
 
-//call function
-  genColorChart()
+
+genColorChart()
 
 
   let colorAccuracy
   let statusOfClick = true;
   let countOfClicks = 0
-
-//function removeList(){}
 
 
 function toggleStatusOfClick() {
@@ -120,7 +118,8 @@ function toggleStatusOfClick() {
 
   if (countOfClicks % 2 == 0){
 
-    genTargetColor()}
+    drawTargets()
+  }
 
     
 
@@ -131,8 +130,8 @@ function toggleStatusOfClick() {
     countOfClicks = 0
 
 
-let newFeedback = document.createElement("p")
-    newFeedback.classList.add("scale-up-center")
+    let newFeedback = document.createElement("p")
+        newFeedback.classList.add("scale-up-center")
 
 
       newFeedback.innerHTML = `Your best sensitivity is <span class="colored"> ${Math.max(...scoreValuesTracking)}% </span>for<span class="colored"><br>that spectrum.</span>`;
@@ -145,7 +144,8 @@ let newFeedback = document.createElement("p")
 
     console.log(
       "this is highest scored color : ", highestScoredColorRGB )
-  //targetRectCounter++
+  
+      //targetRectCounter++
   console.log("target rectangles counter equals: ", targetRectCounter)
     scoreValuesTracking=[]
     scoredColorsArray = []
@@ -161,10 +161,10 @@ let newFeedback = document.createElement("p")
   }
 }
 
-
+//CORRECT
 function calcAccuracy(){
 
-  colorAccuracy = +((1-((((targetR - userR)**2 + (targetG - userG)**2 + (targetB - userB)**2)**0.5)/(255**2+255**2+255**2)**0.5))*100).toFixed(0)
+  colorAccuracy = +((1-((((targetRR - userR)**2 + (targetGG - userG)**2 + (targetBB - userB)**2)**0.5)/(255**2+255**2+255**2)**0.5))*100).toFixed(0)
   console.log("typeof colorAccuracy is", typeof(colorAccuracy))
   console.log("accuracy equals", colorAccuracy)
 }
@@ -190,8 +190,7 @@ listResults = function(arg) {
 let clickableSpace = document.getElementById("example");
     clickableSpace.addEventListener("click", toggleStatusOfClick);
 
-let currColor
-let userR, userG, userB
+
 
 function hoverRgb(e) {
 
@@ -219,8 +218,6 @@ if (userRectCounter == 2){
         context.fillRect(460, 210, 150, 150);
         
         }
-        
-        
         
 
     $("#status").html(
