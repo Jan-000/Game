@@ -1,9 +1,6 @@
 let example = document.getElementById("example");
 let context = example.getContext("2d");
 let scoreValuesTracking=[]
-let targetR
-let targetG
-let targetB
 let highestScoredColorRGB
 let scoredColorsArray = []
 let targetRectCounter = 0
@@ -11,32 +8,35 @@ let userRectCounter = -1
 let targetColorTriplet = []
 let currColor
 let userR, userG, userB
+let targetR1, targetG1, targetB1, targetR2, targetG2, targetB2, targetR3, targetG3, targetB3
 
 
 function genTargetColorTriplet(){
 
-  targetRR = Math.floor(Math.random()*255)
-  targetGG = Math.floor(Math.random()*255)
-  targetBB = Math.floor(Math.random()*255)
+  targetR1 = Math.floor(Math.random()*255)
+  targetG1 = Math.floor(Math.random()*255)
+  targetB1 = Math.floor(Math.random()*255)
 
-  targetColor1 = `rgb(${targetRR},${targetGG},${targetBB})`
+  targetColor1 = `rgb(${targetR1},${targetG1},${targetB1})`
 
-  targetRR = Math.floor(Math.random()*255)
-  targetGG = Math.floor(Math.random()*255)
-  targetBB = Math.floor(Math.random()*255)
+  targetR2 = Math.floor(Math.random()*255)
+  targetG2 = Math.floor(Math.random()*255)
+  targetB2 = Math.floor(Math.random()*255)
 
-  targetColor2 = `rgb(${targetRR},${targetGG},${targetBB})`
+  targetColor2 = `rgb(${targetR2},${targetG2},${targetB2})`
 
-  targetRR = Math.floor(Math.random()*255)
-  targetGG = Math.floor(Math.random()*255)
-  targetBB = Math.floor(Math.random()*255)
+  targetR3 = Math.floor(Math.random()*255)
+  targetG3 = Math.floor(Math.random()*255)
+  targetB3 = Math.floor(Math.random()*255)
 
-  targetColor3 = `rgb(${targetRR},${targetGG},${targetBB})`
+  targetColor3 = `rgb(${targetR3},${targetG3},${targetB3})`
+
   console.log("color triplet is: ", targetColorTriplet)
+  console.log("targetColor1 equals: ", targetColor1, "and type is: ", typeof(targetColor1))
 
   targetColorTriplet.push(targetColor1, targetColor2, targetColor3)}
 
-function drawTargets() {
+function drawTargets() { //powieksza countery
 
   if (targetRectCounter == 0){
 
@@ -73,11 +73,11 @@ drawTargets()
  let grd = context.createLinearGradient(90, 0, 900, 0);
   grd.addColorStop(0, `rgb(${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)})`); 
   grd.addColorStop("0.2", targetColor3);
-  grd.addColorStop("0.22", targetColor3); 
+  // grd.addColorStop("0.21", targetColor3); 
   grd.addColorStop("0.5", targetColor2);
-  grd.addColorStop("0.52", targetColor2);
+  // grd.addColorStop("0.51", targetColor2);
   grd.addColorStop("0.8", targetColor1);
-  grd.addColorStop("0.82", targetColor1);
+  // grd.addColorStop("0.81", targetColor1);
   grd.addColorStop(1, `rgb(${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)})`);
  
  
@@ -99,7 +99,7 @@ function toggleStatusOfClick() {
   
   statusOfClick = !statusOfClick;
   console.log("current status of statusOfClick: ", statusOfClick);
-  console.log("current color is", currentColor)
+  console.log("current color is", currentUserColor)
 
   if (!statusOfClick){
 
@@ -164,7 +164,17 @@ function toggleStatusOfClick() {
 
 function calcAccuracy(){
 
-  colorAccuracy = +((1-((((targetRR - userR)**2 + (targetGG - userG)**2 + (targetBB - userB)**2)**0.5)/(255**2+255**2+255**2)**0.5))*100).toFixed(0)
+console.log("userRectCounter before calcAccuracy is: ", userRectCounter)
+  if (userRectCounter == 0){
+  colorAccuracy = +((1-((((targetR1 - userR)**2 + (targetG1 - userG)**2 + (targetB1 - userB)**2)**0.5)/(255**2+255**2+255**2)**0.5))*100).toFixed(0)}
+  if (userRectCounter == 1){
+    colorAccuracy = +((1-((((targetR2 - userR)**2 + (targetG2 - userG)**2 + (targetB2 - userB)**2)**0.5)/(255**2+255**2+255**2)**0.5))*100).toFixed(0)}
+
+  if (userRectCounter == 2){
+      colorAccuracy = +((1-((((targetR3 - userR)**2 + (targetG3 - userG)**2 + (targetB3 - userB)**2)**0.5)/(255**2+255**2+255**2)**0.5))*100).toFixed(0)}
+
+
+
   console.log("typeof colorAccuracy is", typeof(colorAccuracy))
   console.log("accuracy equals", colorAccuracy)
 }
@@ -182,7 +192,7 @@ listResults = function(arg) {
       scoreValuesTracking.push(arg)
       console.log("Your score is: ", scoreValuesTracking)
 
-      scoredColorsArray.push(currentColor)
+      scoredColorsArray.push(currentUserColor)
       console.log("this is scoredColorsArray: ", scoredColorsArray)
 }
 
@@ -227,7 +237,7 @@ if (userRectCounter == 2){
      userG = p[1]
      userB = p[2]
 
-  } currentColor = [userR, userG, userB]
+  } currentUserColor = [userR, userG, userB]
   
 
 }
