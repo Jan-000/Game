@@ -8,13 +8,36 @@ let highestScoredColorRGB
 let scoredColorsArray = []
 let targetRectCounter = 0
 let userRectCounter = -1
+let targetColorTriplet = []
 
 
 function genTargetColor(){
 
+  targetRR = Math.floor(Math.random()*255)
+  targetGG = Math.floor(Math.random()*255)
+  targetBB = Math.floor(Math.random()*255)
+
+  targetColor1 = `rgb(${targetRR},${targetGG},${targetBB})`
+
+  targetRR = Math.floor(Math.random()*255)
+  targetGG = Math.floor(Math.random()*255)
+  targetBB = Math.floor(Math.random()*255)
+
+  targetColor2 = `rgb(${targetRR},${targetGG},${targetBB})`
+
+  targetRR = Math.floor(Math.random()*255)
+  targetGG = Math.floor(Math.random()*255)
+  targetBB = Math.floor(Math.random()*255)
+
+  targetColor3 = `rgb(${targetRR},${targetGG},${targetBB})`
+ 
+
   targetR = Math.floor(Math.random()*255)
-  targetG = Math.floor(Math.random()*255)//255 - targetR
+  targetG = Math.floor(Math.random()*255)
   targetB = Math.floor(Math.random()*255)
+
+  targetColorTriplet.push(targetColor1, targetColor2, targetColor3)
+  console.log("color triplet is: ", targetColorTriplet)
 
   document.getElementById("example");
 
@@ -47,15 +70,17 @@ function genTargetColor(){
 genTargetColor()
 
  function genColorChart(){
+   console.log("generated gradient has: ", `rgb(${targetR},${targetG},${targetB})`)
  let grd = context.createLinearGradient(90, 0, 900, 0);
-  grd.addColorStop(((Math.random()).toFixed(2))/*0.01*/, "cyan"); 
-  grd.addColorStop(0.1, "magenta");
-  grd.addColorStop(0.25, "blue");
-  grd.addColorStop(((Math.random()).toFixed(2)), `rgb(${targetR},${targetG},${targetB})`);
-  /*grd.addColorStop(0.6, "yellow");
-  grd.addColorStop(0.7, "red")
-  grd.addColorStop(0.85, "white");*/
-  grd.addColorStop(0.96, "black");
+  grd.addColorStop(((Math.random()).toFixed(1)), "cyan"); 
+  grd.addColorStop(((Math.random()).toFixed(1)), "magenta");
+  grd.addColorStop(((Math.random()).toFixed(1)), "blue");
+  grd.addColorStop(((Math.random()).toFixed(1)), `rgb(${targetR},${targetG},${targetB})`);
+  grd.addColorStop(((Math.random()).toFixed(1)), "yellow");
+  grd.addColorStop(((Math.random()).toFixed(1)), `rgb(${targetR},${targetG},${targetB})`);
+  grd.addColorStop(((Math.random()).toFixed(1)), "red")
+  grd.addColorStop(((Math.random()).toFixed(1)), "white");
+  grd.addColorStop(((Math.random()).toFixed(1)), "black");
   context.fillStyle = grd;
   context.fillRect(100, 390, 900, 150)
 
