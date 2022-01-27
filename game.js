@@ -1,10 +1,11 @@
 let context = example.getContext("2d");
-let scoreTracking=[]
+let scoreValuesTracking=[]
 let targetR
 let targetG
 let targetB
-let highestScoredColor
-let currentColorDatabase = []
+let highestScoredColorRGB
+let scoredColorsArray = []
+
 
 function genTargetColor(){
 
@@ -14,7 +15,6 @@ function genTargetColor(){
 
   let example = document.getElementById("example");
   
-
   context.fillStyle = `rgb(${targetR},${targetG},${targetB})`;
   context.fillRect(100, 30, 150, 150);
   console.log("Target color has been generated")
@@ -27,19 +27,18 @@ genTargetColor()
 
  function genColorChart(){
  let grd = context.createLinearGradient(90, 0, 900, 0);
-  grd.addColorStop(0.01, "cyan"); 
+  grd.addColorStop(((Math.random()).toFixed(2))/*0.01*/, "cyan"); 
   grd.addColorStop(0.1, "magenta");
   grd.addColorStop(0.25, "blue");
   grd.addColorStop(((Math.random()).toFixed(2))/*0.5*/, "green");
   grd.addColorStop(0.6, "yellow");
   grd.addColorStop(0.7, "red")
   grd.addColorStop(0.85, "white");
-  grd.addColorStop(0.96, "cyan");
+  grd.addColorStop(0.96, "black");
   context.fillStyle = grd;
   context.fillRect(100, 390, 900, 150)
 
 }
-
 
 //call function
   genColorChart()
@@ -59,11 +58,18 @@ function toggleStatusOfClick() {
   console.log("current color is", currentColor)
 
   if (!statusOfClick){
+
   calcAccuracy()
-  listResults(colorAccuracy)}
-  
+  listResults(colorAccuracy)
+}
+
+
   countOfClicks ++
+
   console.log("count of clicks is: ", countOfClicks)
+  console.log("seems that sub-round is ended here")
+
+  document.querySelector("#displayFeedback").innerHTML =''
 
 
   if (countOfClicks % 2 == 0){
@@ -71,28 +77,27 @@ function toggleStatusOfClick() {
 
 
   if (countOfClicks % 6 == 0){
+
     genColorChart()
 
     countOfClicks = 0
-    document.querySelector("#displayFeedback").innerHTML = `Your best sensitivity is ${Math.max(...scoreTracking)}% in <span>that spectrum.</span>`
-    // console.log("dat ccd: ",currentColorDatabase)
-    // console.log("dat skor trakkin: ", scoreTracking)
-    // console.log("dat max score: ", Math.max(...scoreTracking))
-    // console.log("dat index of max score: ", (scoreTracking.indexOf(Math.max(...scoreTracking))))
-    highestScoredColor = currentColorDatabase[scoreTracking.indexOf(Math.max(...scoreTracking))]
-    console.log("this is highest scored color : ", highestScoredColor )
-
-
+    document.querySelector("#displayFeedback").innerHTML =
+    `Your best sensitivity is ${Math.max(...scoreValuesTracking)}% for<span><br>that spectrum.</span>`
     
+    highestScoredColorRGB = scoredColorsArray[scoreValuesTracking.indexOf(Math.max(...scoreValuesTracking))]
 
+    console.log(
+      "this is highest scored color : ", highestScoredColorRGB )
+  
+    scoreValuesTracking=[]
+    scoredColorsArray = []
 
-    
-    scoreTracking=[]
-    currentColorDatabase = []
     document.querySelector("#listParent").innerHTML = ""
-    giveFeedback()
-    document.querySelector("#displayFeedback>span").style.color = `rgb(${highestScoredColor[0]}, ${highestScoredColor[1]}, ${highestScoredColor[2]})`;
-    console.log("to kod rgb spanu", `rgb(${highestScoredColor[0]}, ${highestScoredColor[1]}, ${highestScoredColor[2]})`)
+
+
+    document.querySelector("#displayFeedback>span").style.color = `rgb(${highestScoredColorRGB[0]}, ${highestScoredColorRGB[1]}, ${highestScoredColorRGB[2]})`;
+
+    console.log("to kod rgb spanu", `rgb(${highestScoredColorRGB[0]}, ${highestScoredColorRGB[1]}, ${highestScoredColorRGB[2]})`)
   }
 }
 
@@ -103,7 +108,6 @@ function calcAccuracy(){
   colorAccuracy = +((1-((((targetR - userR)**2 + (targetG - userG)**2 + (targetB - userB)**2)**0.5)/(255**2+255**2+255**2)**0.5))*100).toFixed(0)
   console.log("typeof colorAccuracy is", typeof(colorAccuracy))
   console.log("accuracy equals", colorAccuracy)
-
 }
 
 
@@ -115,11 +119,11 @@ listResults = function(arg) {
       newLi.innerHTML = `${arg}%`;
       results.appendChild(newLi);
 
-      scoreTracking.push(arg)
-      console.log("Your score is: ", scoreTracking)
+      scoreValuesTracking.push(arg)
+      console.log("Your score is: ", scoreValuesTracking)
 
-      currentColorDatabase.push(currentColor)
-      //console.log("this is currentColorDatabase: ", currentColorDatabase)
+      scoredColorsArray.push(currentColor)
+      //console.log("this is scoredColorsArray: ", scoredColorsArray)
 }
 
 
@@ -153,13 +157,5 @@ function hoverRgb(e) {
 
 //abhören
 document.getElementById("example").addEventListener("mousemove", hoverRgb);
-
-
-//flag 
-
-function giveFeedback(){
-  if (colorAccuracy > 90){console.log("xD")}
-  else {console.log("idz pan w cholere z takimi oczami")}
-}
 
 
