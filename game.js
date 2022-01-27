@@ -16,9 +16,7 @@ function genTargetColor(){
   targetG = Math.floor(Math.random()*255)//255 - targetR
   targetB = Math.floor(Math.random()*255)
 
-document.getElementById("example");
-
-  
+  document.getElementById("example");
 
   context.fillStyle = `rgb(${targetR},${targetG},${targetB})`;
 
@@ -39,27 +37,24 @@ document.getElementById("example");
     context.fillRect(460, 30, 150, 150);
   }
 
-targetRectCounter ++
-userRectCounter ++
+  targetRectCounter ++
+  userRectCounter ++
 
-  
-  console.log("Target color has been generated")
+  console.log("user Rect equals: ", userRectCounter)
+  console.log("Target color has been generated: ", `rgb(${targetR},${targetG},${targetB})`)
 }
 
 genTargetColor()
-
-
-
 
  function genColorChart(){
  let grd = context.createLinearGradient(90, 0, 900, 0);
   grd.addColorStop(((Math.random()).toFixed(2))/*0.01*/, "cyan"); 
   grd.addColorStop(0.1, "magenta");
   grd.addColorStop(0.25, "blue");
-  grd.addColorStop(((Math.random()).toFixed(2))/*0.5*/, "green");
-  grd.addColorStop(0.6, "yellow");
+  grd.addColorStop(((Math.random()).toFixed(2)), `rgb(${targetR},${targetG},${targetB})`);
+  /*grd.addColorStop(0.6, "yellow");
   grd.addColorStop(0.7, "red")
-  grd.addColorStop(0.85, "white");
+  grd.addColorStop(0.85, "white");*/
   grd.addColorStop(0.96, "black");
   context.fillStyle = grd;
   context.fillRect(100, 390, 900, 150)
@@ -111,17 +106,14 @@ function toggleStatusOfClick() {
     countOfClicks = 0
 
 
-
 let newFeedback = document.createElement("p")
     newFeedback.classList.add("scale-up-center")
 
 
-      newFeedback.innerHTML = `Your best sensitivity is ${Math.max(...scoreValuesTracking)}% for<span><br>that spectrum.</span>`;
+      newFeedback.innerHTML = `Your best sensitivity is <span class="colored"> ${Math.max(...scoreValuesTracking)}% </span>for<span class="colored"><br>that spectrum.</span>`;
       document.querySelector("#displayFeedback").appendChild(newFeedback);
 
 
-
-    /*document.querySelector("#displayFeedback").innerHTML =*/
     
     
     highestScoredColorRGB = scoredColorsArray[scoreValuesTracking.indexOf(Math.max(...scoreValuesTracking))]
@@ -129,14 +121,16 @@ let newFeedback = document.createElement("p")
     console.log(
       "this is highest scored color : ", highestScoredColorRGB )
   //targetRectCounter++
-  console.log("round counter equals: ", targetRectCounter)
+  console.log("target rectangles counter equals: ", targetRectCounter)
     scoreValuesTracking=[]
     scoredColorsArray = []
 
     document.querySelector("#listParent").innerHTML = ""
 
 
-    document.querySelector("#displayFeedback>p>span").style.color = `rgb(${highestScoredColorRGB[0]}, ${highestScoredColorRGB[1]}, ${highestScoredColorRGB[2]})`;
+    document.querySelectorAll("span").forEach(function(span){
+      span.style.color = `rgb(${highestScoredColorRGB[0]}, ${highestScoredColorRGB[1]}, ${highestScoredColorRGB[2]})`
+    });
 
     console.log("to kod rgb spanu", `rgb(${highestScoredColorRGB[0]}, ${highestScoredColorRGB[1]}, ${highestScoredColorRGB[2]})`)
   }
@@ -144,8 +138,7 @@ let newFeedback = document.createElement("p")
 
 
 function calcAccuracy(){
-  //console.log("target B is: ",targetB)
-  //console.log("user B is: ", userB)
+
   colorAccuracy = +((1-((((targetR - userR)**2 + (targetG - userG)**2 + (targetB - userB)**2)**0.5)/(255**2+255**2+255**2)**0.5))*100).toFixed(0)
   console.log("typeof colorAccuracy is", typeof(colorAccuracy))
   console.log("accuracy equals", colorAccuracy)
@@ -157,7 +150,6 @@ listResults = function(arg) {
   let results = document.getElementById("listParent");
       var newLi = document.createElement("li");
       newLi.classList.add("scale-up-center")
-
 
       newLi.innerHTML = `${arg}%`;
       results.appendChild(newLi);
@@ -204,7 +196,7 @@ if (userRectCounter == 2){
         }
         
         
-        console.log("targetRectCount equals: ", userRectCounter)
+        
 
     $("#status").html(
       `${p[0]}` + `\xa0\xa0` + `${p[1]}` + `\xa0\xa0` + `${p[2]}`
@@ -220,5 +212,4 @@ if (userRectCounter == 2){
 
 //abhören
 document.getElementById("example").addEventListener("mousemove", hoverRgb);
-
 
