@@ -1,3 +1,4 @@
+let example = document.getElementById("example");
 let context = example.getContext("2d");
 let scoreValuesTracking=[]
 let targetR
@@ -5,6 +6,8 @@ let targetG
 let targetB
 let highestScoredColorRGB
 let scoredColorsArray = []
+let targetRectCounter = 0
+let userRectCounter = -1
 
 
 function genTargetColor(){
@@ -13,10 +16,33 @@ function genTargetColor(){
   targetG = Math.floor(Math.random()*255)//255 - targetR
   targetB = Math.floor(Math.random()*255)
 
-  let example = document.getElementById("example");
+document.getElementById("example");
+
   
+
   context.fillStyle = `rgb(${targetR},${targetG},${targetB})`;
-  context.fillRect(100, 30, 150, 150);
+
+  if (targetRectCounter == 0){
+
+    context.fillRect(100, 30, 150, 150)
+  }
+  
+  
+
+  if (targetRectCounter == 1){
+
+    context.fillRect(280, 30, 150, 150);
+  }
+
+  if (targetRectCounter == 2){
+
+    context.fillRect(460, 30, 150, 150);
+  }
+
+targetRectCounter ++
+userRectCounter ++
+
+  
   console.log("Target color has been generated")
 }
 
@@ -73,29 +99,44 @@ function toggleStatusOfClick() {
 
 
   if (countOfClicks % 2 == 0){
+
     genTargetColor()}
 
+    
 
   if (countOfClicks % 6 == 0){
 
     genColorChart()
 
     countOfClicks = 0
-    document.querySelector("#displayFeedback").innerHTML =
-    `Your best sensitivity is ${Math.max(...scoreValuesTracking)}% for<span><br>that spectrum.</span>`
+
+
+
+let newFeedback = document.createElement("p")
+    newFeedback.classList.add("scale-up-center")
+
+
+      newFeedback.innerHTML = `Your best sensitivity is ${Math.max(...scoreValuesTracking)}% for<span><br>that spectrum.</span>`;
+      document.querySelector("#displayFeedback").appendChild(newFeedback);
+
+
+
+    /*document.querySelector("#displayFeedback").innerHTML =*/
+    
     
     highestScoredColorRGB = scoredColorsArray[scoreValuesTracking.indexOf(Math.max(...scoreValuesTracking))]
 
     console.log(
       "this is highest scored color : ", highestScoredColorRGB )
-  
+  //targetRectCounter++
+  console.log("round counter equals: ", targetRectCounter)
     scoreValuesTracking=[]
     scoredColorsArray = []
 
     document.querySelector("#listParent").innerHTML = ""
 
 
-    document.querySelector("#displayFeedback>span").style.color = `rgb(${highestScoredColorRGB[0]}, ${highestScoredColorRGB[1]}, ${highestScoredColorRGB[2]})`;
+    document.querySelector("#displayFeedback>p>span").style.color = `rgb(${highestScoredColorRGB[0]}, ${highestScoredColorRGB[1]}, ${highestScoredColorRGB[2]})`;
 
     console.log("to kod rgb spanu", `rgb(${highestScoredColorRGB[0]}, ${highestScoredColorRGB[1]}, ${highestScoredColorRGB[2]})`)
   }
@@ -115,6 +156,8 @@ listResults = function(arg) {
 
   let results = document.getElementById("listParent");
       var newLi = document.createElement("li");
+      newLi.classList.add("scale-up-center")
+
 
       newLi.innerHTML = `${arg}%`;
       results.appendChild(newLi);
@@ -141,7 +184,27 @@ function hoverRgb(e) {
     var c = document.getElementById("example").getContext("2d");
     var p = c.getImageData(x, y, 1, 1).data;
     context.fillStyle = `rgb(${p[0]},${p[1]},${p[2]})`;
+
+
+if (userRectCounter == 0){
+
     context.fillRect(100, 210, 150, 150);
+}
+
+
+if (userRectCounter == 1){
+
+      context.fillRect(280, 210, 150, 150);
+}
+
+if (userRectCounter == 2){
+
+        context.fillRect(460, 210, 150, 150);
+        
+        }
+        
+        
+        console.log("targetRectCount equals: ", userRectCounter)
 
     $("#status").html(
       `${p[0]}` + `\xa0\xa0` + `${p[1]}` + `\xa0\xa0` + `${p[2]}`
