@@ -2,21 +2,32 @@
 
 body {
     font-family: Overpass;
-    font-size: 40px;
+    font-size: 29px;
     color: rgb(172, 172, 172);
     background-color: rgb(228, 219, 210)
 }
 
-#status, #results {
+#status {
     margin-left: 100px;
+    margin-top: 0px;
+
 }
 
 
-#displayFeedback {margin-left: 100px;}
+#results {
+    margin-left: 50px;
+}
+
+
+#displayFeedback {
+    margin-left: 100px;
+
+    text-align: justify;
+}
 
 
 span {
-    font-size: 42px;
+
 }
 
 .colored {
@@ -33,17 +44,16 @@ span {
 
 @keyframes scale-up-center {
   0% {
-
-
             opacity: 0.4;
   }
   100% {
-
-
             opacity: 1;
   }
 }
 
-/*zeby spektrum dynamicznie wjezdalo*/
+ul {
+    list-style: none;
+    margin-left: 6px;
+}
 
 

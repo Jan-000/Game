@@ -41,20 +41,20 @@ function drawTargets() { //powieksza countery
   if (targetRectCounter == 0){
 
     context.fillStyle = targetColor1;
-    context.fillRect(100, 30, 150, 150)
+    context.fillRect(100, 30, 100, 100)
     console.log("Target color has been generated:", targetColor1)
   }
   
   
   if (targetRectCounter == 1){
     context.fillStyle = targetColor2;
-    context.fillRect(280, 30, 150, 150);
+    context.fillRect(240, 30, 100, 100);
     console.log("Target color has been generated:", targetColor2)
   }
 
   if (targetRectCounter == 2){
     context.fillStyle = targetColor3;
-    context.fillRect(460, 30, 150, 150);
+    context.fillRect(380, 30, 100, 100);
     console.log("Target color has been generated:", targetColor3)
   }
 
@@ -70,19 +70,20 @@ drawTargets()
 
  function genColorChart(){
    console.log("generated gradient has: ", targetColor1, targetColor2, targetColor3)
- let grd = context.createLinearGradient(90, 0, 900, 0);
+ let grd = context.createLinearGradient(90, 0, 380, 0);
   grd.addColorStop(0, `rgb(${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)})`); 
-  grd.addColorStop("0.2", targetColor3);
+  grd.addColorStop(0.25, targetColor3);
   // grd.addColorStop("0.21", targetColor3); 
-  grd.addColorStop("0.5", targetColor2);
+  grd.addColorStop("0.55", targetColor2);
   // grd.addColorStop("0.51", targetColor2);
-  grd.addColorStop("0.8", targetColor1);
-  // grd.addColorStop("0.81", targetColor1);
+  //grd.addColorStop((0.5+(Math.random()/10)), `rgb(${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)})`)
+  //grd.addColorStop(1, targetColor1);
+  grd.addColorStop("0.75", targetColor1);
   grd.addColorStop(1, `rgb(${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)})`);
  
  
   context.fillStyle = grd;
-  context.fillRect(100, 390, 900, 150)
+  context.fillRect(100, 314, 380, 100)
 
 }
 
@@ -134,7 +135,7 @@ function toggleStatusOfClick() {
         newFeedback.classList.add("scale-up-center")
 
 
-      newFeedback.innerHTML = `Your best sensitivity is <span class="colored"> ${Math.max(...scoreValuesTracking)}% </span>for<span class="colored"><br>that spectrum.</span>`;
+      newFeedback.innerHTML = `Your best sensitivity is <span class="colored"> ${Math.max(...scoreValuesTracking)}% <br>for that spectrum.</span>`;
       document.querySelector("#displayFeedback").appendChild(newFeedback);
 
 
@@ -214,18 +215,18 @@ function hoverRgb(e) {
 
 if (userRectCounter == 0){
 
-    context.fillRect(100, 210, 150, 150);
+    context.fillRect(100, 170, 100, 100);
 }
 
 
 if (userRectCounter == 1){
 
-      context.fillRect(280, 210, 150, 150);
+      context.fillRect(240, 170, 100, 100);
 }
 
 if (userRectCounter == 2){
 
-        context.fillRect(460, 210, 150, 150);
+        context.fillRect(380, 170, 100, 100);
         
         }
         
