@@ -71,14 +71,14 @@ drawTargets()
  function genColorChart(){
    console.log("generated gradient has: ", targetColor1, targetColor2, targetColor3)
  let grd = context.createLinearGradient(90, 0, 900, 0);
-  grd.addColorStop(0, "white"); 
+  grd.addColorStop(0, `rgb(${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)})`); 
   grd.addColorStop("0.2", targetColor3);
-  grd.addColorStop("0.4", targetColor3); 
+  grd.addColorStop("0.22", targetColor3); 
   grd.addColorStop("0.5", targetColor2);
-  grd.addColorStop("0.7", targetColor2);
-  grd.addColorStop("0.75", targetColor1);
-  grd.addColorStop("0.9", targetColor1);
-  grd.addColorStop(1, "cyan");
+  grd.addColorStop("0.52", targetColor2);
+  grd.addColorStop("0.8", targetColor1);
+  grd.addColorStop("0.82", targetColor1);
+  grd.addColorStop(1, `rgb(${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)})`);
  
  
   context.fillStyle = grd;
