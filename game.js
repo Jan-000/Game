@@ -41,9 +41,9 @@ let introHintOpacity = 0.5;
 let introHintFadeFrameId = null;
 let isAdvancingProbe = false;
 let hasFinishedRound = false;
-let bestSpectrumData = null;
-let bestSpectrumNudgeFrameId = null;
-let isBestSpectrumNudging = false;
+let spectrumPairData = [];
+let spectrumNudgeFrameId = null;
+let isSpectrumNudging = false;
 
 function randomRgb() {
   return [
@@ -230,12 +230,12 @@ function drawUserSwatchAt(index, colorTriplet, offsetX = 0, offsetY = 0) {
   context.fillRect(x, USER_ROW_Y + offsetY, SWATCH_SIZE, SWATCH_SIZE);
 }
 
-function redrawBestSpectrumPair(offsetX = 0, offsetY = 0) {
-  if (!bestSpectrumData) {
+function redrawSpectrumPair(pairData, offsetX = 0, offsetY = 0) {
+  if (!pairData) {
     return;
   }
 
-  const index = bestSpectrumData.index;
+  const index = pairData.index;
   const x = SWATCH_START_X + (SWATCH_SIZE + SWATCH_GAP) * index;
   const clearPad = SWATCH_NUDGE_PIXELS + 2;
 
@@ -252,54 +252,68 @@ function redrawBestSpectrumPair(offsetX = 0, offsetY = 0) {
     SWATCH_SIZE + clearPad * 2
   );
 
-  drawTargetSwatchAt(index, bestSpectrumData.targetColor, offsetX, offsetY);
-  drawUserSwatchAt(index, bestSpectrumData.userColor, offsetX, offsetY);
+  drawTargetSwatchAt(index, pairData.targetColor, offsetX, offsetY);
+  drawUserSwatchAt(index, pairData.userColor, offsetX, offsetY);
 }
 
-function animateBestSpectrumNudge() {
-  if (!bestSpectrumData || isBestSpectrumNudging) {
+function animateSpectrumNudge(pairData) {
+  if (!pairData) {
     return;
   }
 
-  isBestSpectrumNudging = true;
+  if (spectrumNudgeFrameId !== null) {
+    cancelAnimationFrame(spectrumNudgeFrameId);
+    spectrumNudgeFrameId = null;
+    isSpectrumNudging = false;
+    redrawSpectrumPair(pairData, 0, 0);
+  }
+
+  isSpectrumNudging = true;
   const totalDurationMs = 520;
   const startTime = performance.now();
 
   function step(now) {
     const t = Math.min((now - startTime) / totalDurationMs, 1);
     const yOffset = -Math.sin(t * Math.PI) * SWATCH_NUDGE_PIXELS;
-    redrawBestSpectrumPair(0, yOffset);
+    redrawSpectrumPair(pairData, 0, yOffset);
 
     if (t < 1) {
-      bestSpectrumNudgeFrameId = requestAnimationFrame(step);
+      spectrumNudgeFrameId = requestAnimationFrame(step);
       return;
     }
 
-    bestSpectrumNudgeFrameId = null;
-    isBestSpectrumNudging = false;
-    redrawBestSpectrumPair(0, 0);
+    spectrumNudgeFrameId = null;
+    isSpectrumNudging = false;
+    redrawSpectrumPair(pairData, 0, 0);
   }
 
-  bestSpectrumNudgeFrameId = requestAnimationFrame(step);
+  spectrumNudgeFrameId = requestAnimationFrame(step);
 }
 
-function attachBestSpectrumHoverHandlers() {
-  const bestPhrase = document.getElementById("bestSpectrumPhrase");
-  if (!bestPhrase || !bestSpectrumData) {
+function attachScoreHoverHandlers() {
+  const scoreItems = document.querySelectorAll("#listParent li.score-entry");
+  if (!scoreItems.length || !spectrumPairData.length) {
     return;
   }
 
-  bestPhrase.addEventListener("mouseenter", function () {
-    animateBestSpectrumNudge();
-  });
+  scoreItems.forEach(function (scoreItem) {
+    scoreItem.addEventListener("mouseenter", function () {
+      const itemIndex = Number(scoreItem.dataset.scoreIndex);
+      animateSpectrumNudge(spectrumPairData[itemIndex]);
+    });
 
-  bestPhrase.addEventListener("mouseleave", function () {
-    if (bestSpectrumNudgeFrameId !== null) {
-      cancelAnimationFrame(bestSpectrumNudgeFrameId);
-      bestSpectrumNudgeFrameId = null;
-      isBestSpectrumNudging = false;
-    }
-    redrawBestSpectrumPair(0, 0);
+    scoreItem.addEventListener("mouseleave", function () {
+      const itemIndex = Number(scoreItem.dataset.scoreIndex);
+      const pairData = spectrumPairData[itemIndex];
+
+      if (spectrumNudgeFrameId !== null) {
+        cancelAnimationFrame(spectrumNudgeFrameId);
+        spectrumNudgeFrameId = null;
+        isSpectrumNudging = false;
+      }
+
+      redrawSpectrumPair(pairData, 0, 0);
+    });
   });
 }
 
@@ -454,23 +468,28 @@ function toggleStatusOfClick(e) {
     countOfClicks = 0;
     userRectCounter = 0;
 
-    let newFeedback = document.createElement("p");
-
-    newFeedback.classList.add("scale-up-center");
-
-    const bestScore = Math.max(...scoreValuesTracking);
-    const bestIndex = scoreValuesTracking.indexOf(bestScore);
+    const bestIndex = scoreValuesTracking.indexOf(Math.max(...scoreValuesTracking));
     const targetColors = [targetColor1, targetColor2, targetColor3];
 
-    bestSpectrumData = {
-      index: bestIndex,
-      targetColor: targetColors[bestIndex],
-      userColor: scoredColorsArray[bestIndex],
-    };
+    spectrumPairData = targetColors.map(function (targetColor, index) {
+      return {
+        index: index,
+        targetColor: targetColor,
+        userColor: scoredColorsArray[index],
+      };
+    });
 
-    newFeedback.innerHTML = `<span class="colored"> ${bestScore}% </span>is your best sensitivity<br><span id="bestSpectrumPhrase" class="colored">within that spectrum.</span>`;
-    document.querySelector("#displayFeedback").appendChild(newFeedback);
-    attachBestSpectrumHoverHandlers();
+    const bestScoreItem = document.querySelector(
+      `#listParent li.score-entry[data-score-index="${bestIndex}"]`
+    );
+    if (bestScoreItem) {
+      const note = document.createElement("span");
+      note.id = "bestSpectrumPhrase";
+      note.classList.add("colored");
+      note.textContent = " is your best sensitivity within that spectrum.";
+      bestScoreItem.appendChild(note);
+    }
+    attachScoreHoverHandlers();
 
     highestScoredColorRGB =
       scoredColorsArray[
@@ -481,7 +500,6 @@ function toggleStatusOfClick(e) {
     //targetRectCounter++
     scoreValuesTracking = [];
     scoredColorsArray = [];
-    document.querySelector("#listParent").innerHTML = "";
     document.querySelectorAll("span").forEach(function (span) {
       span.style.color = `rgb(${highestScoredColorRGB[0]}, ${highestScoredColorRGB[1]}, ${highestScoredColorRGB[2]})`;
     });
@@ -539,7 +557,10 @@ listResults = function (arg) {
 
   var newLi = document.createElement("li");
   newLi.classList.add("scale-up-center");
+  newLi.classList.add("score-entry");
+  newLi.dataset.scoreIndex = String(scoreValuesTracking.length - 1);
   newLi.innerHTML = `${arg}%`;
+  newLi.style.color = `rgb(${currentUserColor[0]}, ${currentUserColor[1]}, ${currentUserColor[2]})`;
   results.appendChild(newLi);
 };
 
