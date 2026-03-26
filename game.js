@@ -29,6 +29,7 @@ const SWATCH_START_X = 100;
 const GRADIENT_X = 100;
 const GRADIENT_Y = USER_ROW_Y + SWATCH_SIZE + VERTICAL_GAP;
 const GRADIENT_SIZE = 320;
+const SWATCH_NUDGE_PIXELS = 6;
 
 let cornerTopLeft;
 let cornerTopRight;
@@ -40,6 +41,9 @@ let introHintOpacity = 0.5;
 let introHintFadeFrameId = null;
 let isAdvancingProbe = false;
 let hasFinishedRound = false;
+let bestSpectrumData = null;
+let bestSpectrumNudgeFrameId = null;
+let isBestSpectrumNudging = false;
 
 function randomRgb() {
   return [
@@ -180,6 +184,91 @@ function drawEndMessageOnChart() {
   context.fillText("refresh to", centerX, centerY - lineGap / 2);
   context.fillText("play again", centerX, centerY + lineGap / 2);
   context.restore();
+}
+
+function drawTargetSwatchAt(index, color, offsetX = 0, offsetY = 0) {
+  const x = SWATCH_START_X + (SWATCH_SIZE + SWATCH_GAP) * index + offsetX;
+  context.fillStyle = color;
+  context.fillRect(x, TARGET_ROW_Y + offsetY, SWATCH_SIZE, SWATCH_SIZE);
+}
+
+function drawUserSwatchAt(index, colorTriplet, offsetX = 0, offsetY = 0) {
+  const x = SWATCH_START_X + (SWATCH_SIZE + SWATCH_GAP) * index + offsetX;
+  context.fillStyle = toRgbString(colorTriplet);
+  context.fillRect(x, USER_ROW_Y + offsetY, SWATCH_SIZE, SWATCH_SIZE);
+}
+
+function redrawBestSpectrumPair(offsetX = 0, offsetY = 0) {
+  if (!bestSpectrumData) {
+    return;
+  }
+
+  const index = bestSpectrumData.index;
+  const x = SWATCH_START_X + (SWATCH_SIZE + SWATCH_GAP) * index;
+  const clearPad = SWATCH_NUDGE_PIXELS + 2;
+
+  context.clearRect(
+    x - clearPad,
+    TARGET_ROW_Y - clearPad,
+    SWATCH_SIZE + clearPad * 2,
+    SWATCH_SIZE + clearPad * 2
+  );
+  context.clearRect(
+    x - clearPad,
+    USER_ROW_Y - clearPad,
+    SWATCH_SIZE + clearPad * 2,
+    SWATCH_SIZE + clearPad * 2
+  );
+
+  drawTargetSwatchAt(index, bestSpectrumData.targetColor, offsetX, offsetY);
+  drawUserSwatchAt(index, bestSpectrumData.userColor, offsetX, offsetY);
+}
+
+function animateBestSpectrumNudge() {
+  if (!bestSpectrumData || isBestSpectrumNudging) {
+    return;
+  }
+
+  isBestSpectrumNudging = true;
+  const totalDurationMs = 520;
+  const startTime = performance.now();
+
+  function step(now) {
+    const t = Math.min((now - startTime) / totalDurationMs, 1);
+    const yOffset = -Math.sin(t * Math.PI) * SWATCH_NUDGE_PIXELS;
+    redrawBestSpectrumPair(0, yOffset);
+
+    if (t < 1) {
+      bestSpectrumNudgeFrameId = requestAnimationFrame(step);
+      return;
+    }
+
+    bestSpectrumNudgeFrameId = null;
+    isBestSpectrumNudging = false;
+    redrawBestSpectrumPair(0, 0);
+  }
+
+  bestSpectrumNudgeFrameId = requestAnimationFrame(step);
+}
+
+function attachBestSpectrumHoverHandlers() {
+  const bestPhrase = document.getElementById("bestSpectrumPhrase");
+  if (!bestPhrase || !bestSpectrumData) {
+    return;
+  }
+
+  bestPhrase.addEventListener("mouseenter", function () {
+    animateBestSpectrumNudge();
+  });
+
+  bestPhrase.addEventListener("mouseleave", function () {
+    if (bestSpectrumNudgeFrameId !== null) {
+      cancelAnimationFrame(bestSpectrumNudgeFrameId);
+      bestSpectrumNudgeFrameId = null;
+      isBestSpectrumNudging = false;
+    }
+    redrawBestSpectrumPair(0, 0);
+  });
 }
 
 function genTargetColorTriplet() {
@@ -333,15 +422,20 @@ function toggleStatusOfClick(e) {
 
     newFeedback.classList.add("scale-up-center");
 
-    newFeedback.innerHTML = `<span class="colored"> ${Math.max(
-      ...scoreValuesTracking
-    )}% </span>is your best sensitivity<br><span class="colored">for that spectrum.</span>`;
+    const bestScore = Math.max(...scoreValuesTracking);
+    const bestIndex = scoreValuesTracking.indexOf(bestScore);
+    const targetColors = [targetColor1, targetColor2, targetColor3];
 
-    newFeedback.innerHTML = `<span class="colored"> ${Math.max(
-      ...scoreValuesTracking
-    )}% </span>is your best sensitivity<br><span class="colored">within that spectrum.</span>
+    bestSpectrumData = {
+      index: bestIndex,
+      targetColor: targetColors[bestIndex],
+      userColor: scoredColorsArray[bestIndex],
+    };
+
+    newFeedback.innerHTML = `<span class="colored"> ${bestScore}% </span>is your best sensitivity<br><span id="bestSpectrumPhrase" class="colored">within that spectrum.</span>
       <br><br><div class="smallPrint">Refresh to play again.</div>`;
     document.querySelector("#displayFeedback").appendChild(newFeedback);
+    attachBestSpectrumHoverHandlers();
 
     highestScoredColorRGB =
       scoredColorsArray[
