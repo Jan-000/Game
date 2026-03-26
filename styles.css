@@ -7,10 +7,6 @@ body {
     background-color: rgb(240, 236, 232)
 }
 
-#status {
-    margin-left: 100px;
-    margin-top: 0px;
-}
 
 
 #results {
@@ -34,9 +30,7 @@ margin-top: -15px
 }
 
 
-.smallPrint{
-    font-size: 15px;
-}
+
 
 
 

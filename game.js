@@ -468,8 +468,7 @@ function toggleStatusOfClick(e) {
       userColor: scoredColorsArray[bestIndex],
     };
 
-    newFeedback.innerHTML = `<span class="colored"> ${bestScore}% </span>is your best sensitivity<br><span id="bestSpectrumPhrase" class="colored">within that spectrum.</span>
-      <br><br><div class="smallPrint">Refresh to play again.</div>`;
+    newFeedback.innerHTML = `<span class="colored"> ${bestScore}% </span>is your best sensitivity<br><span id="bestSpectrumPhrase" class="colored">within that spectrum.</span>`;
     document.querySelector("#displayFeedback").appendChild(newFeedback);
     attachBestSpectrumHoverHandlers();
 
@@ -526,14 +525,22 @@ function calcAccuracy() {
 }
 listResults = function (arg) {
 
-  let results = document.getElementById("listParent");
-  var newLi = document.createElement("li");
+  scoreValuesTracking.push(arg);
+  scoredColorsArray.push(currentUserColor);
 
+  let results = document.getElementById("listParent");
+
+  if (scoreValuesTracking.length === 1) {
+    let label = document.createElement("li");
+    label.classList.add("scale-up-center");
+    label.innerHTML = "Accuracy :";
+    results.appendChild(label);
+  }
+
+  var newLi = document.createElement("li");
   newLi.classList.add("scale-up-center");
   newLi.innerHTML = `${arg}%`;
   results.appendChild(newLi);
-  scoreValuesTracking.push(arg);
-  scoredColorsArray.push(currentUserColor);
 };
 
 let clickableSpace = document.getElementById("example");
@@ -586,9 +593,6 @@ function hoverRgb(e) {
       );
     }
 
-    $("#status").html(
-      `${p[0]}` + `\xa0\xa0` + `${p[1]}` + `\xa0\xa0` + `${p[2]}`
-    );
     userR = p[0];
     userG = p[1];
     userB = p[2];
