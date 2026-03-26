@@ -53,6 +53,38 @@ function randomRgb() {
   ];
 }
 
+function colorDistance(colorA, colorB) {
+  return Math.sqrt(
+    (colorA[0] - colorB[0]) ** 2 +
+      (colorA[1] - colorB[1]) ** 2 +
+      (colorA[2] - colorB[2]) ** 2
+  );
+}
+
+function pickDistinctCornerColor(baseColors, minDistance = 150) {
+  let bestCandidate = randomRgb();
+  let bestMinDistance = -1;
+
+  for (let i = 0; i < 80; i++) {
+    const candidate = randomRgb();
+    const distances = baseColors.map(function (baseColor) {
+      return colorDistance(candidate, baseColor);
+    });
+    const candidateMinDistance = Math.min(...distances);
+
+    if (candidateMinDistance >= minDistance) {
+      return candidate;
+    }
+
+    if (candidateMinDistance > bestMinDistance) {
+      bestMinDistance = candidateMinDistance;
+      bestCandidate = candidate;
+    }
+  }
+
+  return bestCandidate;
+}
+
 function toRgbString(color) {
   return `rgb(${color[0]},${color[1]},${color[2]})`;
 }
@@ -373,7 +405,11 @@ function genColorChart() {
   cornerTopLeft = randomRgb();
   cornerTopRight = randomRgb();
   cornerBottomLeft = randomRgb();
-  cornerBottomRight = randomRgb();
+  cornerBottomRight = pickDistinctCornerColor([
+    cornerTopLeft,
+    cornerTopRight,
+    cornerBottomLeft,
+  ]);
   drawGradientFromCorners();
 }
 
@@ -403,7 +439,7 @@ function toggleStatusOfClick(e) {
     listResults(colorAccuracy);
 
     if (scoreValuesTracking.length < 3) {
-      fadeInNextTarget(500, 500);
+      fadeInNextTarget(200, 600);
     }
   }
   countOfClicks++;
