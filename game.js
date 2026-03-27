@@ -1,14 +1,15 @@
 let example = document.getElementById("example");
 let context = example.getContext("2d");
 let scoreValuesTracking = [];
-let highestScoredColorRGB;
 let scoredColorsArray = [];
+let displayedScores = [];
 let targetRectCounter = 0;
 let userRectCounter = -1;
 let targetColorTriplet = [];
 let targetPointTriplet = [];
 let currColor;
 let userR, userG, userB;
+let hasActiveHoverColor = false;
 let targetR1,
     targetG1,
     targetB1,
@@ -24,9 +25,9 @@ const SWATCH_SIZE = 90;
 const SWATCH_GAP = 25;
 const VERTICAL_GAP = SWATCH_GAP;
 const USER_ROW_Y = TARGET_ROW_Y + SWATCH_SIZE + VERTICAL_GAP;
-const SWATCH_START_X = 100;
+const SWATCH_START_X = Math.round((example.width - 320) / 2);
 
-const GRADIENT_X = 100;
+const GRADIENT_X = SWATCH_START_X;
 const GRADIENT_Y = USER_ROW_Y + SWATCH_SIZE + VERTICAL_GAP;
 const GRADIENT_SIZE = 320;
 const SWATCH_NUDGE_PIXELS = 6;
@@ -41,6 +42,7 @@ let introHintOpacity = 0.5;
 let introHintFadeFrameId = null;
 let isAdvancingProbe = false;
 let hasFinishedRound = false;
+let topScoreIndex = -1;
 let spectrumPairData = [];
 let spectrumNudgeFrameId = null;
 let isSpectrumNudging = false;
@@ -213,9 +215,65 @@ function drawEndMessageOnChart() {
   const centerY = GRADIENT_Y + GRADIENT_SIZE / 2;
   const lineGap = 30;
 
-  context.fillText("refresh to", centerX, centerY - lineGap / 2);
+  context.fillText("tap to", centerX, centerY - lineGap / 2);
   context.fillText("play again", centerX, centerY + lineGap / 2);
   context.restore();
+}
+
+function getCanvasPointFromEvent(e) {
+  const rect = example.getBoundingClientRect();
+  const scaleX = example.width / rect.width;
+  const scaleY = example.height / rect.height;
+
+  let source = e;
+  if (e.changedTouches && e.changedTouches.length) {
+    source = e.changedTouches[0];
+  } else if (e.touches && e.touches.length) {
+    source = e.touches[0];
+  }
+
+  if (
+    typeof source.clientX !== "number" ||
+    typeof source.clientY !== "number"
+  ) {
+    return null;
+  }
+
+  return {
+    x: (source.clientX - rect.left) * scaleX,
+    y: (source.clientY - rect.top) * scaleY,
+  };
+}
+
+function resetAndStartNewRound() {
+  if (introHintFadeFrameId !== null) {
+    cancelAnimationFrame(introHintFadeFrameId);
+    introHintFadeFrameId = null;
+  }
+  if (spectrumNudgeFrameId !== null) {
+    cancelAnimationFrame(spectrumNudgeFrameId);
+    spectrumNudgeFrameId = null;
+  }
+
+  context.clearRect(0, 0, example.width, example.height);
+
+  targetRectCounter = 0;
+  userRectCounter = -1;
+  scoreValuesTracking = [];
+  scoredColorsArray = [];
+  displayedScores = [];
+  spectrumPairData = [];
+  topScoreIndex = -1;
+  hasFinishedRound = false;
+  isAdvancingProbe = false;
+  statusOfClick = true;
+  countOfClicks = 0;
+  hasActiveHoverColor = false;
+  hasDismissedIntroHint = false;
+  isIntroHintFading = false;
+  introHintOpacity = 0.5;
+
+  drawRoundStart();
 }
 
 function drawTargetSwatchAt(index, color, offsetX = 0, offsetY = 0) {
@@ -228,6 +286,37 @@ function drawUserSwatchAt(index, colorTriplet, offsetX = 0, offsetY = 0) {
   const x = SWATCH_START_X + (SWATCH_SIZE + SWATCH_GAP) * index + offsetX;
   context.fillStyle = toRgbString(colorTriplet);
   context.fillRect(x, USER_ROW_Y + offsetY, SWATCH_SIZE, SWATCH_SIZE);
+}
+
+function clearScoreTextArea(index) {
+  const x = SWATCH_START_X + (SWATCH_SIZE + SWATCH_GAP) * index;
+  context.clearRect(x - 8, 0, SWATCH_SIZE + 16, TARGET_ROW_Y - 2);
+}
+
+function drawScoreTextForIndex(index, includeTopLabel = false) {
+  const scoreData = displayedScores[index];
+  if (!scoreData) {
+    return;
+  }
+
+  const x = SWATCH_START_X + (SWATCH_SIZE + SWATCH_GAP) * index + SWATCH_SIZE / 2;
+
+  clearScoreTextArea(index);
+  context.save();
+  context.fillStyle = toRgbString(scoreData.colorTriplet);
+  context.textAlign = "center";
+  context.textBaseline = "middle";
+
+  if (includeTopLabel) {
+    context.font = "700 15px Overpass, sans-serif";
+    context.fillText("top", x, 9);
+    context.fillText(`accuracy ${scoreData.score}%`, x, 23);
+  } else {
+    context.font = "700 24px Overpass, sans-serif";
+    context.fillText(`${scoreData.score}%`, x, 16);
+  }
+
+  context.restore();
 }
 
 function redrawSpectrumPair(pairData, offsetX = 0, offsetY = 0) {
@@ -254,6 +343,7 @@ function redrawSpectrumPair(pairData, offsetX = 0, offsetY = 0) {
 
   drawTargetSwatchAt(index, pairData.targetColor, offsetX, offsetY);
   drawUserSwatchAt(index, pairData.userColor, offsetX, offsetY);
+  drawScoreTextForIndex(index, index === topScoreIndex);
 }
 
 function animateSpectrumNudge(pairData) {
@@ -428,6 +518,8 @@ function genColorChart() {
 }
 
 function drawRoundStart() {
+  displayedScores = [];
+  topScoreIndex = -1;
   genColorChart();
   genTargetColorTriplet();
   drawTargets();
@@ -442,7 +534,15 @@ let statusOfClick = true;
 let countOfClicks = 0;
 
 function toggleStatusOfClick(e) {
-  if (isAdvancingProbe || hasFinishedRound) {
+  if (hasFinishedRound) {
+    const point = getCanvasPointFromEvent(e);
+    if (point && isInsideColorChart(point.x, point.y)) {
+      resetAndStartNewRound();
+    }
+    return;
+  }
+
+  if (isAdvancingProbe) {
     return;
   }
 
@@ -479,30 +579,12 @@ function toggleStatusOfClick(e) {
       };
     });
 
-    const bestScoreItem = document.querySelector(
-      `#listParent li.score-entry[data-score-index="${bestIndex}"]`
-    );
-    if (bestScoreItem) {
-      const note = document.createElement("span");
-      note.id = "bestSpectrumPhrase";
-      note.classList.add("colored");
-      note.textContent = " is your best sensitivity within that spectrum.";
-      bestScoreItem.appendChild(note);
-    }
-    attachScoreHoverHandlers();
-
-    highestScoredColorRGB =
-      scoredColorsArray[
-        scoreValuesTracking.indexOf(Math.max(...scoreValuesTracking))
-      ];
-
+    topScoreIndex = bestIndex;
+    drawScoreTextForIndex(bestIndex, true);
 
     //targetRectCounter++
     scoreValuesTracking = [];
     scoredColorsArray = [];
-    document.querySelectorAll("span").forEach(function (span) {
-      span.style.color = `rgb(${highestScoredColorRGB[0]}, ${highestScoredColorRGB[1]}, ${highestScoredColorRGB[2]})`;
-    });
   }
 }
 function calcAccuracy() {
@@ -546,22 +628,12 @@ listResults = function (arg) {
   scoreValuesTracking.push(arg);
   scoredColorsArray.push(currentUserColor);
 
-  let results = document.getElementById("listParent");
+  displayedScores.push({
+    score: arg,
+    colorTriplet: [...currentUserColor],
+  });
 
-  if (scoreValuesTracking.length === 1) {
-    let label = document.createElement("li");
-    label.classList.add("scale-up-center");
-    label.innerHTML = "Accuracy :";
-    results.appendChild(label);
-  }
-
-  var newLi = document.createElement("li");
-  newLi.classList.add("scale-up-center");
-  newLi.classList.add("score-entry");
-  newLi.dataset.scoreIndex = String(scoreValuesTracking.length - 1);
-  newLi.innerHTML = `${arg}%`;
-  newLi.style.color = `rgb(${currentUserColor[0]}, ${currentUserColor[1]}, ${currentUserColor[2]})`;
-  results.appendChild(newLi);
+  drawScoreTextForIndex(displayedScores.length - 1, false);
 };
 
 let clickableSpace = document.getElementById("example");
@@ -589,6 +661,7 @@ function hoverRgb(e) {
       y < GRADIENT_Y ||
       y > GRADIENT_Y + GRADIENT_SIZE
     ) {
+      hasActiveHoverColor = false;
       return;
     }
 
@@ -619,6 +692,7 @@ function hoverRgb(e) {
     userR = p[0];
     userG = p[1];
     userB = p[2];
+    hasActiveHoverColor = true;
   }
   currentUserColor = [userR, userG, userB];
 }
@@ -628,4 +702,15 @@ document.getElementById("example").addEventListener("mousemove", hoverRgb);
 document.getElementById("example").addEventListener("touchmove", function (e) {
   e.preventDefault();
   hoverRgb(e.touches[0]);
+}, { passive: false });
+document.getElementById("example").addEventListener("touchend", function (e) {
+  e.preventDefault();
+  if (hasFinishedRound) {
+    toggleStatusOfClick(e);
+    return;
+  }
+  if (statusOfClick && hasActiveHoverColor) {
+    toggleStatusOfClick(e);
+    hasActiveHoverColor = false;
+  }
 }, { passive: false });
