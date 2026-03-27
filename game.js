@@ -11,14 +11,14 @@ let currColor;
 let userR, userG, userB;
 let hasActiveHoverColor = false;
 let targetR1,
-    targetG1,
-    targetB1,
-    targetR2,
-    targetG2,
-    targetB2,
-    targetR3,
-    targetG3,
-    targetB3;
+  targetG1,
+  targetB1,
+  targetR2,
+  targetG2,
+  targetB2,
+  targetR3,
+  targetG3,
+  targetB3;
 
 const SCORE_TEXT_BAND_HEIGHT = 34;
 
@@ -129,8 +129,8 @@ function randomRgb() {
 function colorDistance(colorA, colorB) {
   return Math.sqrt(
     (colorA[0] - colorB[0]) ** 2 +
-      (colorA[1] - colorB[1]) ** 2 +
-      (colorA[2] - colorB[2]) ** 2
+    (colorA[1] - colorB[1]) ** 2 +
+    (colorA[2] - colorB[2]) ** 2
   );
 }
 
@@ -379,11 +379,12 @@ function drawScoreTextForIndex(index, includeTopLabel = false) {
   context.textBaseline = "middle";
 
   if (includeTopLabel) {
-    context.font = "700 15px Overpass, sans-serif";
-    context.fillText("top", x, SCORE_TEXT_TOP_Y + 9);
-    context.fillText(`accuracy ${scoreData.score}%`, x, SCORE_TEXT_TOP_Y + 23);
+    context.font = "700 18px Overpass, sans-serif";
+    context.fillText(`${scoreData.score}%`, x, SCORE_TEXT_TOP_Y + 9);
+    context.font = "700 11px Overpass, sans-serif";
+    context.fillText("TOP ACCURACY", x, SCORE_TEXT_TOP_Y + 24);
   } else {
-    context.font = "700 24px Overpass, sans-serif";
+    context.font = "700 18px Overpass, sans-serif";
     context.fillText(`${scoreData.score}%`, x, SCORE_TEXT_TOP_Y + 16);
   }
 
@@ -621,7 +622,7 @@ function toggleStatusOfClick(e) {
   }
 
   statusOfClick = !statusOfClick;
- 
+
   if (!statusOfClick) {
     calcAccuracy();
     listResults(colorAccuracy);
@@ -669,8 +670,8 @@ function calcAccuracy() {
         ((targetR1 - userR) ** 2 +
           (targetG1 - userG) ** 2 +
           (targetB1 - userB) ** 2) **
-          0.5 /
-          (255 ** 2 + 255 ** 2 + 255 ** 2) ** 0.5) *
+        0.5 /
+        (255 ** 2 + 255 ** 2 + 255 ** 2) ** 0.5) *
       100
     ).toFixed(0);
   }
@@ -680,8 +681,8 @@ function calcAccuracy() {
         ((targetR2 - userR) ** 2 +
           (targetG2 - userG) ** 2 +
           (targetB2 - userB) ** 2) **
-          0.5 /
-          (255 ** 2 + 255 ** 2 + 255 ** 2) ** 0.5) *
+        0.5 /
+        (255 ** 2 + 255 ** 2 + 255 ** 2) ** 0.5) *
       100
     ).toFixed(0);
   }
@@ -691,8 +692,8 @@ function calcAccuracy() {
         ((targetR3 - userR) ** 2 +
           (targetG3 - userG) ** 2 +
           (targetB3 - userB) ** 2) **
-          0.5 /
-          (255 ** 2 + 255 ** 2 + 255 ** 2) ** 0.5) *
+        0.5 /
+        (255 ** 2 + 255 ** 2 + 255 ** 2) ** 0.5) *
       100
     ).toFixed(0);
   }
