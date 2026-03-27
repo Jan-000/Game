@@ -20,17 +20,20 @@ let targetR1,
     targetG3,
     targetB3;
 
-const TARGET_ROW_Y = 30;
-const SWATCH_SIZE = 90;
-const SWATCH_GAP = 25;
-const VERTICAL_GAP = SWATCH_GAP;
-const USER_ROW_Y = TARGET_ROW_Y + SWATCH_SIZE + VERTICAL_GAP;
-const SWATCH_START_X = Math.round((example.width - 320) / 2);
+const SCORE_TEXT_BAND_HEIGHT = 34;
 
-const GRADIENT_X = SWATCH_START_X;
-const GRADIENT_Y = USER_ROW_Y + SWATCH_SIZE + VERTICAL_GAP;
-const GRADIENT_SIZE = 320;
-const SWATCH_NUDGE_PIXELS = 6;
+let TARGET_ROW_Y;
+let SCORE_TEXT_TOP_Y;
+let SWATCH_SIZE;
+let SWATCH_GAP;
+let VERTICAL_GAP;
+let USER_ROW_Y;
+let SWATCH_START_X;
+
+let GRADIENT_X;
+let GRADIENT_Y;
+let GRADIENT_SIZE;
+let SWATCH_NUDGE_PIXELS;
 
 let cornerTopLeft;
 let cornerTopRight;
@@ -46,6 +49,74 @@ let topScoreIndex = -1;
 let spectrumPairData = [];
 let spectrumNudgeFrameId = null;
 let isSpectrumNudging = false;
+let hasQueuedFontScoreRefresh = false;
+
+function updateCanvasSizeForViewport() {
+  const isMobile = window.matchMedia("(max-width: 600px)").matches;
+
+  if (isMobile) {
+    const mobileWidth = Math.max(320, Math.floor(window.innerWidth * 0.95));
+    const mobileHeight = Math.max(520, Math.floor(window.innerHeight * 0.9));
+    example.width = mobileWidth;
+    example.height = mobileHeight;
+    return;
+  }
+
+  example.width = 800;
+  example.height = 680;
+}
+
+function updateLayoutMetrics() {
+  const maxGradientByWidth = Math.round(example.width * 0.84);
+  const maxGradientByHeight = Math.round(
+    (example.height - SCORE_TEXT_BAND_HEIGHT - 16) / 1.72
+  );
+
+  GRADIENT_SIZE = Math.max(220, Math.min(maxGradientByWidth, maxGradientByHeight, 540));
+  SWATCH_GAP = Math.max(14, Math.round(GRADIENT_SIZE * 0.08));
+  SWATCH_SIZE = Math.round((GRADIENT_SIZE - SWATCH_GAP * 2) / 3);
+  VERTICAL_GAP = SWATCH_GAP;
+
+  const blockHeight =
+    SCORE_TEXT_BAND_HEIGHT +
+    SWATCH_SIZE +
+    VERTICAL_GAP +
+    SWATCH_SIZE +
+    VERTICAL_GAP +
+    GRADIENT_SIZE;
+  const blockTop = Math.max(0, Math.round((example.height - blockHeight) / 2));
+
+  SCORE_TEXT_TOP_Y = blockTop;
+  TARGET_ROW_Y = SCORE_TEXT_TOP_Y + SCORE_TEXT_BAND_HEIGHT;
+  USER_ROW_Y = TARGET_ROW_Y + SWATCH_SIZE + VERTICAL_GAP;
+  SWATCH_START_X = Math.round((example.width - GRADIENT_SIZE) / 2);
+  GRADIENT_X = SWATCH_START_X;
+  GRADIENT_Y = USER_ROW_Y + SWATCH_SIZE + VERTICAL_GAP;
+  SWATCH_NUDGE_PIXELS = Math.max(5, Math.round(SWATCH_SIZE * 0.07));
+}
+
+function redrawAllScoreTexts() {
+  for (let i = 0; i < displayedScores.length; i++) {
+    drawScoreTextForIndex(i, i === topScoreIndex);
+  }
+}
+
+function queueFontScoreRefresh() {
+  if (hasQueuedFontScoreRefresh) {
+    return;
+  }
+  hasQueuedFontScoreRefresh = true;
+
+  if (!document.fonts || !document.fonts.load) {
+    return;
+  }
+
+  document.fonts.load("700 24px Overpass").then(function () {
+    redrawAllScoreTexts();
+  }).catch(function () {
+    // Keep current rendering if font loading API fails.
+  });
+}
 
 function randomRgb() {
   return [
@@ -290,7 +361,7 @@ function drawUserSwatchAt(index, colorTriplet, offsetX = 0, offsetY = 0) {
 
 function clearScoreTextArea(index) {
   const x = SWATCH_START_X + (SWATCH_SIZE + SWATCH_GAP) * index;
-  context.clearRect(x - 8, 0, SWATCH_SIZE + 16, TARGET_ROW_Y - 2);
+  context.clearRect(x - 8, SCORE_TEXT_TOP_Y, SWATCH_SIZE + 16, SCORE_TEXT_BAND_HEIGHT);
 }
 
 function drawScoreTextForIndex(index, includeTopLabel = false) {
@@ -309,11 +380,11 @@ function drawScoreTextForIndex(index, includeTopLabel = false) {
 
   if (includeTopLabel) {
     context.font = "700 15px Overpass, sans-serif";
-    context.fillText("top", x, 9);
-    context.fillText(`accuracy ${scoreData.score}%`, x, 23);
+    context.fillText("top", x, SCORE_TEXT_TOP_Y + 9);
+    context.fillText(`accuracy ${scoreData.score}%`, x, SCORE_TEXT_TOP_Y + 23);
   } else {
     context.font = "700 24px Overpass, sans-serif";
-    context.fillText(`${scoreData.score}%`, x, 16);
+    context.fillText(`${scoreData.score}%`, x, SCORE_TEXT_TOP_Y + 16);
   }
 
   context.restore();
@@ -518,6 +589,9 @@ function genColorChart() {
 }
 
 function drawRoundStart() {
+  updateCanvasSizeForViewport();
+  updateLayoutMetrics();
+  queueFontScoreRefresh();
   displayedScores = [];
   topScoreIndex = -1;
   genColorChart();
@@ -714,3 +788,15 @@ document.getElementById("example").addEventListener("touchend", function (e) {
     hasActiveHoverColor = false;
   }
 }, { passive: false });
+
+let resizeRoundTimer = null;
+window.addEventListener("resize", function () {
+  if (resizeRoundTimer !== null) {
+    clearTimeout(resizeRoundTimer);
+  }
+
+  resizeRoundTimer = setTimeout(function () {
+    resizeRoundTimer = null;
+    resetAndStartNewRound();
+  }, 180);
+});
