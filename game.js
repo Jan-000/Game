@@ -215,9 +215,10 @@ function drawIntroHint(opacity = introHintOpacity) {
   const centerX = GRADIENT_X + GRADIENT_SIZE / 2;
   const centerY = GRADIENT_Y + GRADIENT_SIZE / 2;
   const lineGap = 30;
+  const isMobile = window.matchMedia("(max-width: 600px)").matches;
 
-  context.fillText("click the", centerX, centerY - lineGap / 2);
-  context.fillText("matching color", centerX, centerY + lineGap / 2);
+  context.fillText(isMobile ? "slide finger" : "click the", centerX, centerY - lineGap / 2);
+  context.fillText(isMobile ? "match color" : "matching color", centerX, centerY + lineGap / 2);
   context.restore();
 }
 
