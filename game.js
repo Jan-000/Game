@@ -573,8 +573,10 @@ function hoverRgb(e) {
   }
 
   const rect = example.getBoundingClientRect();
-  var x = e.clientX - rect.left;
-  var y = e.clientY - rect.top;
+  const scaleX = example.width / rect.width;
+  const scaleY = example.height / rect.height;
+  var x = (e.clientX - rect.left) * scaleX;
+  var y = (e.clientY - rect.top) * scaleY;
 
   if (!hasDismissedIntroHint && isInsideColorChart(x, y)) {
     startIntroHintFade();
@@ -623,3 +625,7 @@ function hoverRgb(e) {
 
 //abhören
 document.getElementById("example").addEventListener("mousemove", hoverRgb);
+document.getElementById("example").addEventListener("touchmove", function (e) {
+  e.preventDefault();
+  hoverRgb(e.touches[0]);
+}, { passive: false });
